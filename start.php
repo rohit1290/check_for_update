@@ -33,11 +33,14 @@ function check_for_update_init() {
 }
 
 function getGitProperty($url){
-	$url = $url."?client_id=c7f2a9d3a484d12753d0&client_secret=08cb2770e4861353356c2e496721c1b7b4e0b2fd";
+  $token = elgg_get_plugin_setting('token', 'check_for_update');
+  $client_id = elgg_get_plugin_setting('client_id', 'check_for_update');
+  $client_secret = elgg_get_plugin_setting('client_secret', 'check_for_update');
+  $url = $url."?access_token=$token&token=$token&client_id=$client_id&client_secret=$client_secret";
   $c = curl_init();
   curl_setopt($c, CURLOPT_URL, $url);
   curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($c, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+  curl_setopt($c, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
   $content = curl_exec($c);
   curl_close($c);
   return json_decode($content, true);
@@ -115,6 +118,8 @@ function update_check_for_update_table($update_type = 'all') {
 				$adv_commit++;
 			}
 			
+			$adv_commit = (int)$adv_commit;
+			
 			// Manifest version
 			$github_manifest = json_decode(json_encode(simplexml_load_string(file_get_contents("https://raw.githubusercontent.com/$github_owner/$github_repo/master/manifest.xml"))), true);
 			$github_manifest = $github_manifest['version'];
@@ -127,7 +132,7 @@ function update_check_for_update_table($update_type = 'all') {
 			if($github_manifest != $dbrow->github_manifest) {
 				$sql_set_string[] = "`github_manifest`='$github_manifest'";
 			}
-			if($adv_commit != $dbrow->github_adv_commit) {
+			if($adv_commit != (int)$dbrow->github_adv_commit) {
 				$sql_set_string[] = "`github_adv_commit`='$adv_commit'";
 			}
 		}
