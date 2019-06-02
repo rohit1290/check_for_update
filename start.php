@@ -121,7 +121,11 @@ function update_check_for_update_table($update_type = 'all') {
 			$adv_commit = (int)$adv_commit;
 			
 			// Manifest version
-			$github_manifest = json_decode(json_encode(simplexml_load_string(file_get_contents("https://raw.githubusercontent.com/$github_owner/$github_repo/master/manifest.xml"))), true);
+			$context  = stream_context_create(['http' => [
+                'method'  => 'GET',
+                'header' => 'Authorization: Bearer '. elgg_get_plugin_setting('token', 'check_for_update')
+            ]]);
+			$github_manifest = json_decode(json_encode(simplexml_load_string(file_get_contents("https://raw.githubusercontent.com/$github_owner/$github_repo/master/manifest.xml", false, $context))), true);
 			$github_manifest = $github_manifest['version'];
 			
 			$latest_tag_name = str_replace("v","",$latest_tag_name);
