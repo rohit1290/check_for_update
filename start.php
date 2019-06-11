@@ -1,21 +1,8 @@
 <?php 
 
-
-/************************************************************************************************************************
-Enable/Disable User Activity on Plugin Activation/Deactivation
-************************************************************************************************************************/
-
 elgg_register_event_handler('init', 'system', 'check_for_update_init');
 
 function check_for_update_init() {
-	// elgg_register_menu_item('page', [
-	// 	'name' => 'administer_utilities:check_for_update_setting',
-	// 	'text' => elgg_echo('admin:administer_utilities:check_for_update_setting'),
-	// 	'href' => 'admin/administer_utilities/check_for_update_setting',
-	// 	'section' => 'administer',
-	// 	'parent_name' => 'administer_utilities',
-	// 	'context' => 'admin',
-	// ]);
 	elgg_register_menu_item('page', [
 		'name' => 'administer_utilities:check_for_update_view',
 		'text' => elgg_echo('admin:administer_utilities:check_for_update_view'),
@@ -53,14 +40,10 @@ function update_check_for_update_table($update_type = 'all') {
     echo "Plugin update check started for $update_type\n";
 
 	$dbprefix = elgg_get_config('dbprefix');
-  $dbrows = elgg()->db->getData("SELECT * FROM `{$dbprefix}check_for_update` WHERE `check_update`='yes' AND `github_url` <> ''");
+	$dbrows = elgg()->db->getData("SELECT * FROM `{$dbprefix}check_for_update` WHERE `check_update`='yes' AND `github_url` <> ''");
 	foreach ($dbrows as $dbrow) {
-	    unset($github_version1);
-	    unset($github_version2);
-	    unset($github_version3);
-	    unset($github_version);
-	
-	    $plugin_id = $dbrow->plugin_id;
+
+		$plugin_id = $dbrow->plugin_id;
 		$plugin = elgg_get_plugin_from_id($plugin_id);
 		
 		if($plugin == null){
