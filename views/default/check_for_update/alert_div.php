@@ -9,7 +9,7 @@ if($dbrow->cnt > 0){
 }
 
 // Check for missing plugin entries
-$plugins = elgg_get_plugins($status = 'all');
+$plugins = elgg_get_plugins('active');
 $dbplugin = array();
 foreach($plugins as $plugin){
   $dbplugin[$plugin->getID()] = $plugin->getID();
