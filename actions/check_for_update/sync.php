@@ -13,8 +13,13 @@ if($tag_name == null) {
   forward(REFERRER);
 }
 
-// change working directory
 $path = elgg_get_plugins_path()."$plugin_id";
+if(!file_exists($path)) {
+  register_error("Unknown path");
+  forward(REFERRER);
+}
+
+// change working directory
 chdir($path);
 
 // check if git is initialize
@@ -37,23 +42,19 @@ if($o_remote_url == $repo){
 } else if($u_remote_url == $repo){
   $pull_from  = 'upstream';
 } else {
-  if($pull_from  == ''){
-    $pull_from  = 'origin';
-  } else {
-    $pull_from  = 'upstream';
-  }
+  $pull_from  = 'origin';
   exec("git remote set-url $pull_from $repo");
 }
 
 if($sync_type == 'rel'){
-  exec("git clean -f -d");
-  exec("git stash");
-  exec("git pull $pull_from tag v$tag_name --no-tags --allow-unrelated-histories");
-  exec("git reset --hard v$tag_name");
-  exec("git pull $pull_from tag $tag_name --no-tags --allow-unrelated-histories");
-  exec("git reset --hard $tag_name");
+//   exec("git clean -f -d");
+//   exec("git stash");
+//   exec("git pull $pull_from tag v$tag_name --no-tags --allow-unrelated-histories");
+//   exec("git reset --hard v$tag_name");
+//   exec("git pull $pull_from tag $tag_name --no-tags --allow-unrelated-histories");
+//   exec("git reset --hard $tag_name");
 } else {
-  exec("git fetch $pull_from");
+//   exec("git fetch $pull_from");
   exec("git pull $pull_from master");
 }
 
