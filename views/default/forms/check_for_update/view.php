@@ -85,22 +85,7 @@ foreach ($data as $dbrow) {
     $action = "No action required";
     $class = "bg-green disabled";
   } else if($dbrow->github_tag_name > $dbrow->current_version || $dbrow->github_manifest > $dbrow->current_version){
-    // if($dbrow->github_adv_commit > 0) {
-    //   // button to update all commit
-    // } else {
-    //   // button to update till release
-    // }
-    $sync_url = elgg_generate_action_url('check_for_update/sync', [
-  		'sync_type' => 'rel',
-  		'plugin_id' => $dbrow->plugin_id,
-  		'tag_name' => $dbrow->github_tag_name,
-  	]);
-    $action = elgg_view('output/url', [
-    	'href' => $sync_url,
-    	'text' => "Update release",
-    	'title' => "Update release",
-    	'is_trusted' => true,
-    ]);
+    $action = "Plugin requires update";
     $class = "bg-red disabled";
   } else if($dbrow->github_tag_name < $dbrow->current_version || $dbrow->github_manifest < $dbrow->current_version) {
     $action = "Updated plugin installed";
