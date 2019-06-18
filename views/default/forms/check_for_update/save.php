@@ -24,7 +24,6 @@ $sql = "SELECT * FROM  `{$dbprefix}check_for_update`";
 $data = elgg()->db->getData($sql);
 foreach ($data as $dbrow) {
   $dbplugin[$dbrow->plugin_id]['github'] = $dbrow->github_url;
-  $dbplugin[$dbrow->plugin_id]['elgg'] = $dbrow->elgg_url;
   $dbplugin[$dbrow->plugin_id]['check_update'] = $dbrow->check_update;
 }
 
@@ -61,16 +60,6 @@ foreach($plugins as $plugin){
     $github = $dbplugin[$plugin_id]['github'];
   }
  echo "<input type='text' name='github_urls[$i]' value='{$github}' placeholder='Enter Github Repo URL'>";
-  // Show link for elgg
-  $elgg = "";
-  if($dbplugin[$plugin_id]['elgg'] == null) {
-    if (strpos($url, 'elgg') !== false) {
-      $elgg = $url;
-    }
-  } else {
-    $elgg = $dbplugin[$plugin_id]['elgg'];
-  }
- echo "<input type='hidden' name='elgg_urls[$i]' value='{$elgg}' placeholder='Enter Elgg Plugin URL'>";
  
   echo elgg_view_field(array(
      '#type' => 'select',
