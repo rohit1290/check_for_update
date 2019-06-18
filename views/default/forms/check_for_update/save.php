@@ -40,7 +40,7 @@ foreach($plugins as $plugin){
   $plugin_id = $plugin->getID();
   $author = $plugin->getManifest()->getAuthor();
   
-  if($author == "Core developers" && $dbplugin[$plugin_id]['check_update'] == "") {
+  if (strpos(strtolower($author), strtolower('Core developers')) !== false && $dbplugin[$plugin_id]['check_update'] == "") {
     $dbplugin[$plugin_id]['check_update'] = "no";
   }
   
