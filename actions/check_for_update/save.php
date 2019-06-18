@@ -13,7 +13,7 @@ foreach ($plugin_ids as $plugin_id) {
     elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `github_url`='{$github_urls[$i]}', `check_update`='{$check_update[$i]}' WHERE `id`=$id");
   } else {
     //Create
-    elgg()->db->insertData("INSERT INTO `{$dbprefix}check_for_update` (`plugin_id`, `github_url`, `check_update`) VALUES ('{$plugin_ids[$i]}', '{$github_urls[$i]}', '{$elgg_urls[$i]}', '{$check_update[$i]}')");
+    elgg()->db->insertData("INSERT INTO `{$dbprefix}check_for_update` (`plugin_id`, `github_url`, `check_update`) VALUES ('{$plugin_ids[$i]}', '{$github_urls[$i]}', '{$check_update[$i]}')");
   }
   $i++;
 }
