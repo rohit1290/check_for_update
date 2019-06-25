@@ -64,6 +64,35 @@ function update_check_for_update_table($update_type = 'all') {
 			if($plugin_version != $dbrow->current_version){
 				$sql_set_string[] = "`current_version`='$plugin_version'";
 			}
+			
+			// # of advance and behind commit
+			$cdir = getcwd();
+			$path = elgg_get_plugins_path()."$plugin_id";
+	    chdir($path);
+			
+			$o_remote_url = exec("git remote get-url origin");
+			if($o_remote_url != $dbrow->github_url) {
+				register_error("Origin URL is not same as DB URL for plugin $plugin_id; $o_remote_url; {$dbrow->github_url}");
+				continue;
+			}
+			
+			exec("git fetch origin master");
+			$output = exec('git rev-list --left-right --count origin/master...master');
+			if($output == "" || $output == null) {
+				$adv_commit = "-|-";
+			} else {
+				$output = explode("	", $output);
+	    	$commit_behind = trim($output[0]);
+	    	$commit_ahead = trim($output[1]);
+				$adv_commit = "$commit_ahead|$commit_behind";
+			}
+			
+			if($adv_commit != $dbrow->github_adv_commit) {
+				$sql_set_string[] = "`github_adv_commit`='$adv_commit'";
+			}
+			
+			chdir($cdir);
+			unset($cdir);
 		}
 		
 		if($update_type == "all" || $update_type == "github") {
@@ -76,32 +105,33 @@ function update_check_for_update_table($update_type = 'all') {
 			$github_rel = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/releases/latest");
 			$latest_tag_name = $github_rel['tag_name'];
 
-			// Github SHA ID
-			$github_tags = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/tags");
-			if(count($github_tags) > 0) {
-    			if($latest_tag_name == "" || $latest_tag_name == null){
-    				$latest_tag_name = $github_tags[0]['name'];
-    			}
-    					
-    			foreach ($github_tags as $github_tag) {
-    				if($github_tag['name'] == $latest_tag_name){
-    					$github_sha = $github_tag['commit']['sha'];
-    					break;
-    				}
-    			}
-			}
-			
-			// # of advance commit
-			$adv_commit = 0;
-			$github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
-			foreach ($github_commits as $github_commit) {
-				if($github_commit['sha'] == $github_sha){
-					break;
-				}
-				$adv_commit++;
-			}
-			
-			$adv_commit = (int)$adv_commit;
+			// // Github SHA ID
+			// $github_tags = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/tags");
+			// if(count($github_tags) > 0) {
+    	// 		if($latest_tag_name == "" || $latest_tag_name == null){
+    	// 			$latest_tag_name = $github_tags[0]['name'];
+    	// 		}
+			// 
+    	// 		foreach ($github_tags as $github_tag) {
+    	// 			if($github_tag['name'] == $latest_tag_name){
+    	// 				$github_sha = $github_tag['commit']['sha'];
+    	// 				break;
+    	// 			}
+    	// 		}
+			// }
+			// 
+			// // # of advance commit
+			// $adv_commit = 0;
+			// $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
+			// foreach ($github_commits as $github_commit) {
+			// 	if($github_commit['sha'] == $github_sha){
+			// 		break;
+			// 	}
+			// 	$adv_commit++;
+			// }
+			// 
+			// $adv_commit = (int)$adv_commit;
+			// 
 			
 			// Manifest version
 			$context  = stream_context_create(['http' => [
@@ -118,9 +148,6 @@ function update_check_for_update_table($update_type = 'all') {
 			}
 			if($github_manifest != $dbrow->github_manifest) {
 				$sql_set_string[] = "`github_manifest`='$github_manifest'";
-			}
-			if($adv_commit != (int)$dbrow->github_adv_commit) {
-				$sql_set_string[] = "`github_adv_commit`='$adv_commit'";
 			}
 		}
 		

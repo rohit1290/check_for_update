@@ -81,15 +81,33 @@ foreach ($data as $dbrow) {
     continue;
   }
   $status = ($plugin->isActive() ? '<small class="label bg-green">Active</small>' : '<small class="label bg-red">Inactive</small>');
-  if($dbrow->github_tag_name == $dbrow->current_version || $dbrow->github_manifest == $dbrow->current_version) {
-    $action = "No action required";
-    $class = "bg-green disabled";
-  } else if($dbrow->github_tag_name > $dbrow->current_version || $dbrow->github_manifest > $dbrow->current_version){
-    $action = "Plugin requires update";
+  
+  $count = explode("|",$dbrow->github_adv_commit);
+  
+  if($count[1] > 0){
+    // $action = "Plugin requires update";
+    $action_url = elgg_generate_action_url('check_for_update/sync',[
+      'plugin_id' => $dbrow->plugin_id,
+      'sync_type' => 'all',
+      'tag_name' => $dbrow->github_tag_name,
+    ]);
+    $action = "<a href='$action_url'>Sync</a>";
+    
+    $action_url = elgg_generate_action_url('check_for_update/sync',[
+      'plugin_id' => $dbrow->plugin_id,
+      'sync_type' => 'all',
+      'change_type' => 'clean',
+      'tag_name' => $dbrow->github_tag_name,
+    ]);
+    $action = $action ."<br><a href='$action_url'>Clean & Sync</a>";
+    
     $class = "bg-red disabled";
   } else if($dbrow->github_tag_name < $dbrow->current_version || $dbrow->github_manifest < $dbrow->current_version) {
     $action = "Updated plugin installed";
     $class = "bg-yellow disabled";
+  } else {
+    $action = "No action required";
+    $class = "bg-green disabled";
   }
   $github_parts = explode("/",$dbrow->github_url);
     echo "<tr>";
@@ -121,7 +139,7 @@ foreach ($data as $dbrow) {
       <th>Owner</th>
       <th>Github<br>Tag</th>
       <th>Github<br>Manifest</th>
-      <th>Advance<br>Commits</th>
+      <th>Change Count<br>Local|Remote</th>
       <th>Installed</th>
     </tr>
   </thead>
