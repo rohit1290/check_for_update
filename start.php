@@ -33,7 +33,9 @@ function getGitProperty($url){
   return json_decode($content, true);
 }
 
-function update_check_for_update_table($update_type = 'all') {
+function update_check_for_update_table(\Elgg\Hook $hook) {
+	$update_type = $hook->getName(); 
+
     if($update_type == "" || $update_type == null || $update_type == 'cron'){
         $update_type = 'all';
     }
