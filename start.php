@@ -13,7 +13,7 @@ function check_for_update_init() {
 	]);
 	
 	// Update data on daily basis
-	elgg_register_plugin_hook_handler('cron', 'daily', 'update_check_for_update_table');
+	elgg_register_plugin_hook_handler('cron', 'daily', 'call_check_for_update_func');
 	
 	elgg_extend_view("admin/dashboard", "check_for_update/alert_div", 1);
 	
@@ -33,12 +33,12 @@ function getGitProperty($url) {
 	return json_decode($content, true);
 }
 
-function update_check_for_update_table(\Elgg\Hook $hook) {
-	$update_type = $hook->getName();
+function call_check_for_update_func() {
+	update_check_for_update_table('all');
+}
 
-	if ($update_type == "" || $update_type == null || $update_type == 'cron') {
-		$update_type = 'all';
-	}
+// $update_type - all, github, local
+function update_check_for_update_table($update_type = 'all') {
 	echo "Plugin update check started for $update_type\n";
 
 	$dbprefix = elgg_get_config('dbprefix');
