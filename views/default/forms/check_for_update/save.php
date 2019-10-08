@@ -28,7 +28,7 @@ foreach ($data as $dbrow) {
 }
 
 //fetch all plugin
-$plugins = elgg_get_plugins($status = 'all');
+$plugins = elgg_get_plugins('all');
 
 $i = 0;
 foreach ($plugins as $plugin) {
