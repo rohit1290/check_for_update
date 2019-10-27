@@ -1,6 +1,7 @@
 <?php
 $dbprefix = elgg_get_config('dbprefix');
-$sql = "SELECT COUNT(*) as `cnt` FROM `{$dbprefix}check_for_update` WHERE (`github_tag_name`>`current_version` OR `github_manifest`>`current_version`) AND `check_update`='yes' AND `github_url` IS NOT NULL";
+// $sql = "SELECT COUNT(*) as `cnt` FROM `{$dbprefix}check_for_update` WHERE (`github_tag_name`>`current_version` OR `github_manifest`>`current_version`) AND `check_update`='yes' AND `github_url` IS NOT NULL";
+$sql = "SELECT COUNT(*) as `cnt` FROM `{$dbprefix}check_for_update` WHERE (`github_tag_name`>`current_version`) AND `check_update`='yes' AND `github_url` IS NOT NULL";
 $dbrow = elgg()->db->getDataRow($sql);
 if ($dbrow->cnt > 0) {
 	echo elgg_view_message('error',
