@@ -25,4 +25,5 @@ class CheckForUpdate extends DefaultPluginBootstrap {
   }
  
 }
- ?> 
+
+ ?>
