@@ -1,11 +1,13 @@
 <?php
 
 function getGitProperty($url) {
+	$username = elgg_get_plugin_setting('git_username', 'check_for_update');
 	$token = elgg_get_plugin_setting('token', 'check_for_update');
-	$client_id = elgg_get_plugin_setting('client_id', 'check_for_update');
-	$client_secret = elgg_get_plugin_setting('client_secret', 'check_for_update');
-	$url = $url."?access_token=$token&token=$token&client_id=$client_id&client_secret=$client_secret";
+	// $client_id = elgg_get_plugin_setting('client_id', 'check_for_update');
+	// $client_secret = elgg_get_plugin_setting('client_secret', 'check_for_update');
+	// $url = $url."?access_token=$token&token=$token&client_id=$client_id&client_secret=$client_secret";
 	$c = curl_init();
+	curl_setopt($c, CURLOPT_USERPWD, "{$username}:{$token}");
 	curl_setopt($c, CURLOPT_URL, $url);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($c, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
