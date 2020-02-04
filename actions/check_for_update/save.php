@@ -21,4 +21,4 @@ foreach ($plugin_ids as $plugin_id) {
 system_message("Entry saved sucessfully!");
 
 forward(REFERRER);
-	?>
+	

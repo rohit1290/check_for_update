@@ -36,14 +36,14 @@ foreach ($plugins as $plugin) {
 		echo "<tr><td colspan='6'>$plugin->guid</td></tr>";
 		continue;
 	}
-  
+
 	$plugin_id = $plugin->getID();
 	$author = $plugin->getManifest()->getAuthor();
-  
+
 	if (strpos(strtolower($author), strtolower('Core developers')) !== false && $dbplugin[$plugin_id]['check_update'] == "") {
 		$dbplugin[$plugin_id]['check_update'] = "no";
 	}
-  
+
 	$status = ($plugin->isActive() ? '<small class="label bg-green">Active</small>' : '<small class="label bg-red">Inactive</small>');
   //Show Name (plugin_id) status
 	echo "<b>{$plugin->getManifest()->getName()}</b> ({$plugin->getID()} by $author) $status";
@@ -60,7 +60,7 @@ foreach ($plugins as $plugin) {
 		$github = $dbplugin[$plugin_id]['github'];
 	}
 	echo "<input type='text' name='github_urls[$i]' value='{$github}' placeholder='Enter Github Repo URL'>";
- 
+
 	echo elgg_view_field([
 	 '#type' => 'select',
 	 '#label' => "Check for Update",
@@ -73,7 +73,7 @@ foreach ($plugins as $plugin) {
 	 'value' => $dbplugin[$plugin_id]['check_update'],
 	]);
 	echo "<br>";
-  
+
 	$i++;
 }
 echo elgg_view('input/submit', [
@@ -81,4 +81,4 @@ echo elgg_view('input/submit', [
 		'name' => 'submit',
 		'class' => 'elgg-button-submit mls',
 	]);
-	?>
+	

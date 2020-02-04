@@ -66,7 +66,7 @@ foreach ($data as $dbrow) {
 		echo "</tr>";
 		continue;
 	}
-  
+
 	if (!is_dir( $plugin->getPath() )) {
 		echo "<tr>";
 		echo "<td><a href='".$dbrow->github_url."' target='_blank'>". $dbrow->plugin_id . "</a></td>";
@@ -163,7 +163,7 @@ $sql = "SELECT * FROM  `{$dbprefix}check_for_update` WHERE `check_update`='no'";
 $data = elgg()->db->getData($sql);
 foreach ($data as $dbrow) {
 	$plugin = elgg_get_plugin_from_id($dbrow->plugin_id);
-	
+
 	if ($plugin == null) {
 		$author = "DELETED";
 	} else {

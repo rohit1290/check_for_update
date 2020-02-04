@@ -24,4 +24,3 @@ echo elgg_view('output/url', [
 ]);
 echo "<br><br>";
 echo elgg_view_form("check_for_update/view");
-?>

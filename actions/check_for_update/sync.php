@@ -62,4 +62,3 @@ update_check_for_update_table('local');
 system_message("Plugin $plugin_id updated sucessfully");
 forward(REFERRER);
 
-?>

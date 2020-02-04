@@ -27,4 +27,4 @@ if (count($dbplugin) > 0) {
 	'You need to map '.implode(", ", $dbplugin).' with github url for update check. <a href="'.elgg_get_site_url().'admin/administer_utilities/check_for_update_setting">Click here</a> to update list.',
 	['title' => 'Alert!']);
 }
-	?>
+	

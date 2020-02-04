@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 function getGitProperty($url) {
 	$token = elgg_get_plugin_setting('token', 'check_for_update');
@@ -27,7 +27,7 @@ function update_check_for_update_table($update_type = 'all') {
 	foreach ($dbrows as $dbrow) {
 		$plugin_id = $dbrow->plugin_id;
 		$plugin = elgg_get_plugin_from_id($plugin_id);
-		
+
 		if ($plugin == null) {
 			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `check_update`='no' WHERE `plugin_id`='$plugin_id'");
 			continue;
@@ -39,7 +39,7 @@ function update_check_for_update_table($update_type = 'all') {
 		}
 
 		$sql_set_string = [];
-		
+
 		if ($update_type == "all" || $update_type == "local") {
 			// Plugin Version
 			$plugin_version = $plugin->getManifest()->getVersion();
@@ -47,7 +47,7 @@ function update_check_for_update_table($update_type = 'all') {
 				$sql_set_string[] = "`current_version`='$plugin_version'";
 			}
 		}
-		
+
 		if ($update_type == "all" || $update_type == "github") {
 			// Github version
 			$github_parts = explode("/", $dbrow->github_url);
@@ -64,7 +64,7 @@ function update_check_for_update_table($update_type = 'all') {
 				if ($latest_tag_name == "" || $latest_tag_name == null) {
 					$latest_tag_name = $github_tags[0]['name'];
 				}
-					
+
 				foreach ($github_tags as $github_tag) {
 					if ($github_tag['name'] == $latest_tag_name) {
 						$github_sha = $github_tag['commit']['sha'];
@@ -72,7 +72,7 @@ function update_check_for_update_table($update_type = 'all') {
 					}
 				}
 			}
-			
+
 			// # of advance commit
 			$adv_commit = 0;
 			$github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
@@ -82,9 +82,9 @@ function update_check_for_update_table($update_type = 'all') {
 				}
 				$adv_commit++;
 			}
-			
+
 			$adv_commit = (int) $adv_commit;
-			
+
 			// Manifest version
 			$context  = stream_context_create(['http' => [
 				'method'  => 'GET',
@@ -92,9 +92,9 @@ function update_check_for_update_table($update_type = 'all') {
 			]]);
 			$github_manifest = json_decode(json_encode(simplexml_load_string(file_get_contents("https://raw.githubusercontent.com/$github_owner/$github_repo/master/manifest.xml", false, $context))), true);
 			$github_manifest = $github_manifest['version'];
-			
+
 			$latest_tag_name = str_replace("v", "", $latest_tag_name);
-			
+
 			if ($latest_tag_name != $dbrow->github_tag_name) {
 				$sql_set_string[] = "`github_tag_name`='$latest_tag_name'";
 			}
@@ -105,13 +105,13 @@ function update_check_for_update_table($update_type = 'all') {
 				$sql_set_string[] = "`github_adv_commit`='$adv_commit'";
 			}
 		}
-		
+
 		if (count($sql_set_string) > 0) {
 			$set_string = implode(",", $sql_set_string);
 			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET $set_string WHERE `plugin_id`='$plugin_id'");
 		}
 	}
-		
+
 	$time = time();
 	if ($update_type == "all" || $update_type == "local") {
 		elgg_set_plugin_setting('local_update_time', $time, 'check_for_update');
@@ -122,4 +122,4 @@ function update_check_for_update_table($update_type = 'all') {
 	echo "Plugin update check completed";
 }
 
- ?>
+ 
