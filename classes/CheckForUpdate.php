@@ -23,6 +23,25 @@ class CheckForUpdate extends DefaultPluginBootstrap {
     $path = dirname(dirname(__FILE__))."/db/check_for_update.sql";
     _elgg_services()->db->runSqlScript($path);
   }
+  
+  public function upgrade() {
+  	$dbprefix = elgg_get_config('dbprefix');
+  	$dbrows = elgg()->db->getData("SELECT * FROM `{$dbprefix}check_for_update` WHERE `check_update`='yes'");
+  	foreach ($dbrows as $dbrow) {
+  		$plugin_id = $dbrow->plugin_id;
+  		$plugin = elgg_get_plugin_from_id($plugin_id);
+
+  		if ($plugin == null) {
+  			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `check_update`='no' WHERE `plugin_id`='$plugin_id'");
+  			continue;
+  		}
+
+  		if (!is_dir($plugin->getPath())) {
+  			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `check_update`='no' WHERE `plugin_id`='$plugin_id'");
+  			continue;
+  		}
+    }
+  }
 
 }
 
