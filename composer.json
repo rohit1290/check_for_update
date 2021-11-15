@@ -1,0 +1,18 @@
+{
+	"name": "check_for_update",
+	"description": "Check if a plugin upade is available",
+	"homepage": "http://www.campuskarma.in/",
+	"type": "elgg-plugin",
+	"keywords": ["elgg", "plugin", "admin"],
+	"license": "Private Use",
+	"support": {
+		"source": "https://github.com/rohit1290/check_for_update",
+		"issues": "https://github.com/rohit1290/check_for_update/issues"
+	},
+	"require": {
+		"composer/installers": "^1.0.8"
+	},
+	"conflict": {
+		"elgg/elgg": "<4.0"
+	}
+}
