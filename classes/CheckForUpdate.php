@@ -14,35 +14,10 @@ class CheckForUpdate extends DefaultPluginBootstrap {
     	]);
 
     	// Update data on daily basis
-    	elgg_register_plugin_hook_handler('cron', 'daily', 'call_check_for_update_func');
+    	elgg_register_plugin_hook_handler('cron', 'daily', 'update_check_for_update_table');
 
     	elgg_extend_view("admin/dashboard", "check_for_update/alert_div", 1);
   }
-
-  public function activate() {
-    $path = dirname(dirname(__FILE__))."/db/check_for_update.sql";
-    _elgg_services()->db->runSqlScript($path);
-  }
-  
-  public function upgrade() {
-  	$dbprefix = elgg_get_config('dbprefix');
-  	$dbrows = elgg()->db->getData("SELECT * FROM `{$dbprefix}check_for_update` WHERE `check_update`='yes'");
-  	foreach ($dbrows as $dbrow) {
-  		$plugin_id = $dbrow->plugin_id;
-  		$plugin = elgg_get_plugin_from_id($plugin_id);
-
-  		if ($plugin == null) {
-  			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `check_update`='no' WHERE `plugin_id`='$plugin_id'");
-  			continue;
-  		}
-
-  		if (!is_dir($plugin->getPath())) {
-  			elgg()->db->updateData("UPDATE `{$dbprefix}check_for_update` SET `check_update`='no' WHERE `plugin_id`='$plugin_id'");
-  			continue;
-  		}
-    }
-  }
-
 }
 
  
