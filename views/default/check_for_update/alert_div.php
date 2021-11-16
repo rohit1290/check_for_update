@@ -1,6 +1,6 @@
 <?php
 
-$list = pluginGetList();
+$plugins = pluginGetList();
 $flag = 0;
 foreach ($plugins as $plugin_id => $plugin) {
 	if($plugin['action'] == "Plugin requires update") {
