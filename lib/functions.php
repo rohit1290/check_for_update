@@ -78,7 +78,8 @@ function getGitProperty($url) {
 	curl_setopt($c, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
 	$content = curl_exec($c);
 	curl_close($c);
-	return json_decode($content, true);
+	$result = json_decode($content, true);
+  return is_array($result) ? $result : [];
 }
 
 function update_check_for_update_table() {
@@ -127,11 +128,13 @@ function update_check_for_update_table() {
           // # of advance commit
           $adv_commit = 0;
           $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
-          foreach ($github_commits as $github_commit) {
-            if ($github_commit['sha'] == $github_sha) {
-              break;
+          if(count($github_commits) > 0) {
+            foreach ($github_commits as $github_commit) {
+              if ($github_commit['sha'] == $github_sha) {
+                break;
+              }
+              $adv_commit++;
             }
-            $adv_commit++;
           }
         }
 
