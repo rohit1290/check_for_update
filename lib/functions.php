@@ -125,15 +125,17 @@ function update_check_for_update_table() {
           $github_sha = exec("git rev-parse HEAD");
           chdir($nowpath);
           
-          // # of advance commit
-          $adv_commit = 0;
-          $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
-          if(count($github_commits) > 0) {
-            foreach ($github_commits as $github_commit) {
-              if ($github_commit['sha'] == $github_sha) {
-                break;
+          if(strlen($github_sha) == 40) {
+            // # of advance commit
+            $adv_commit = 0;
+            $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
+            if(count($github_commits) > 0) {
+              foreach ($github_commits as $github_commit) {
+                if ($github_commit['sha'] == $github_sha) {
+                  break;
+                }
+                $adv_commit++;
               }
-              $adv_commit++;
             }
           }
         }
