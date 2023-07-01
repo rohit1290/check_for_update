@@ -8,7 +8,16 @@ function pluginGetList() {
   	if ($plugin == null || !is_dir( $plugin->getPath())) {
   		continue;
   	}
-    $github_parts = explode("/", $plugin->getRepositoryURL());
+    $gitURL = $plugin->getRepositoryURL();
+    if($gitURL != "") {
+      $github_parts = explode("/", $gitURL);
+    } else {
+      $github_parts = [
+        1 => "",
+        2 => "",
+        3 => ""
+      ];
+    }
     if($github_parts[3] == "elgg") {
       continue;
     }
@@ -125,15 +134,17 @@ function update_check_for_update_table() {
           $github_sha = exec("git rev-parse HEAD");
           chdir($nowpath);
           
-          // # of advance commit
-          $adv_commit = 0;
-          $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
-          if(count($github_commits) > 0) {
-            foreach ($github_commits as $github_commit) {
-              if ($github_commit['sha'] == $github_sha) {
-                break;
+          if(strlen($github_sha) == 40) {
+            // # of advance commit
+            $adv_commit = 0;
+            $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
+            if(count($github_commits) > 0) {
+              foreach ($github_commits as $github_commit) {
+                if ($github_commit['sha'] == $github_sha) {
+                  break;
+                }
+                $adv_commit++;
               }
-              $adv_commit++;
             }
           }
         }
