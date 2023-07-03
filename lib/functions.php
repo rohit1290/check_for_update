@@ -35,16 +35,20 @@ function pluginGetList() {
     $final[$id]['current_version'] = $plugin->getVersion();
     $final[$id]['owner'] = $github_parts[3];
     
-    if ($plugin->getVersion() == "0.1") {
+    $pluginGetVersion = getFormattedVersion($plugin->getVersion());
+    $pluginGetGitTagName = getFormattedVersion($plugin->getSetting('github_tag_name'));
+    $pluginGetGitComp = getFormattedVersion($plugin->getSetting('github_composer'));
+    
+    if ($pluginGetVersion == floatval("0.1")) {
       $final[$id]['action'] = "Plugin does not have a version";
       $final[$id]['class'] = "bg-gray disabled";
-    } else if ($plugin->getSetting('github_tag_name') == $plugin->getVersion() || $plugin->getSetting('github_composer') == $plugin->getVersion()) {
+    } else if ($pluginGetGitTagName == $pluginGetVersion || $pluginGetGitComp == $pluginGetVersion) {
       $final[$id]['action'] = "No action required";
       $final[$id]['class'] = "bg-green disabled";
-    } else if ($plugin->getSetting('github_tag_name') > $plugin->getVersion()  && $plugin->getSetting('github_composer') > $plugin->getVersion()) {
+    } else if ($pluginGetGitTagName > $pluginGetVersion  && $pluginGetGitComp > $pluginGetVersion) {
       $final[$id]['action'] = "Plugin requires update";
       $final[$id]['class'] = "bg-red disabled";
-    } else if ($plugin->getSetting('github_tag_name') < $plugin->getVersion()  && $plugin->getSetting('github_composer') < $plugin->getVersion()) {
+    } else if ($pluginGetGitTagName < $pluginGetVersion  && $pluginGetGitComp < $pluginGetVersion) {
       $final[$id]['action'] = "Updated plugin installed";
       $final[$id]['class'] = "bg-yellow disabled";
     }
@@ -168,4 +172,13 @@ function update_check_for_update_table() {
     elgg_get_plugin_from_id('check_for_update')->setSetting('github_update_time', $time);
   	echo "Plugin update check completed";
   });
+}
+
+function getFormattedVersion($ver) {
+  $ver = preg_replace('/[^0-9.]/', '',  $ver);
+  $vp = explode(".", $ver);
+  if(count($vp) >= 3) {
+    $ver = array_shift($vp). "." . implode("", $vp);
+  }
+  return floatval($ver);
 }
