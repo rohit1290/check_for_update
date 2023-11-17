@@ -27,7 +27,7 @@ class AdminHeader {
       'name' => 'administer_utilities:check_for_update_view',
       'text' => elgg_echo('admin:administer_utilities:check_for_update_view'),
       'href' => 'admin/administer_utilities/check_for_update_view',
-			'parent_name' => 'administer_utilities',
+			'parent_name' => 'utilities',
 		]);
     
 		return $return;
