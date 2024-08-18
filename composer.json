@@ -9,10 +9,7 @@
 		"source": "https://github.com/rohit1290/check_for_update",
 		"issues": "https://github.com/rohit1290/check_for_update/issues"
 	},
-	"require": {
-		"composer/installers": "^1.0.8"
-	},
 	"conflict": {
-		"elgg/elgg": "<5.1"
+		"elgg/elgg": "<6.0"
 	}
 }

@@ -14,8 +14,6 @@ $username_view = elgg_view('input/text', [
 ]);
 
 $settings = <<<__HTML
-<!-- <div>$client_id_string $client_id_view</div> -->
-<!-- <div>$client_secret_string $client_secret_view</div> -->
 <div>$token_string $token_view</div>
 <div>$username_string $username_view</div>
 __HTML;

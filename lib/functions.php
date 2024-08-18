@@ -92,7 +92,7 @@ function getGitProperty($url) {
 	$content = curl_exec($c);
 	curl_close($c);
 	$result = json_decode($content, true);
-  return is_array($result) ? $result : [];
+  return is_array($result) ? $result : ['download_url' => "", "tag_name" => "", "name" => ""];
 }
 
 function update_check_for_update_table() {
