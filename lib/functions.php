@@ -144,8 +144,10 @@ function update_check_for_update_table() {
             $github_commits = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/commits");
             if(count($github_commits) > 0) {
               foreach ($github_commits as $github_commit) {
-                if ($github_commit['sha'] == $github_sha) {
-                  break;
+                if(array_key_exists('sha', $github_commit)) {
+                  if ($github_commit['sha'] == $github_sha) {
+                    break;
+                  }
                 }
                 $adv_commit++;
               }
