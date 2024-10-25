@@ -1,6 +1,6 @@
 <?php
 echo elgg_view('output/url', [
-	'text' => 'Update Github',
+	'text' => 'Check for Update',
 	'href' => elgg_generate_action_url("check_for_update/update"),
 	'class' => 'elgg-anchor elgg-menu-content elgg-button elgg-button-action',
 ]);

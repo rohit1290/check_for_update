@@ -184,3 +184,26 @@ function getFormattedVersion($ver) {
   }
   return floatval($ver);
 }
+
+function update_check_for_update_elgg() {
+  $url = "https://api.github.com/repos/elgg/elgg/releases";
+  $c = curl_init();
+  curl_setopt($c, CURLOPT_URL, $url);
+  curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($c, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+  $content = curl_exec($c);
+  curl_close($c);
+  $result = json_decode($content, true);
+  $current = getFormattedVersion(elgg_get_release());
+  $tag_name = 0;
+  foreach ($result as $key => $v) {
+    if ($key >= 5) break;
+    if($current < getFormattedVersion($v['tag_name'])) {
+      $tag_name = $v['tag_name'];
+      break;
+    }
+  }
+  if($tag_name != 0) {
+    elgg_get_plugin_from_id('check_for_update')->setSetting('latest_release', $tag_name);
+  }
+}

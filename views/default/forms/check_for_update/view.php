@@ -27,7 +27,7 @@
 </style>
 <div style="font-size:small">
 <?php
-echo "<b>Github Update:</b> ". date("d M Y H:i:s", elgg_get_plugin_setting('github_update_time', 'check_for_update'))."<br>";
+echo "<b>Last Update Run:</b> ". date("d M Y H:i:s", elgg_get_plugin_setting('github_update_time', 'check_for_update'))."<br>";
 echo "<b>Current Time:</b> ". date("d M Y H:i:s")."<br>";
 echo "<br>";
 ?>
