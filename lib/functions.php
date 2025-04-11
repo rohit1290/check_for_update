@@ -28,7 +28,7 @@ function pluginGetList() {
       $final[$id]['github_url'] = $plugin->getRepositoryURL();
     }
     $final[$id]['id'] = $id;
-    $final[$id]['status'] = ($plugin->isActive() ? '<small class="label bg-green">Active</small>' : '<small class="label bg-red">Inactive</small>');
+    $final[$id]['status'] = ($plugin->isActive() ? '<p class="label bg-green small">Active</p>' : '<p class="label bg-red small">Inactive</p>');
     $final[$id]['github_composer'] = $plugin->getSetting('github_composer');
     $final[$id]['github_tag_name'] = $plugin->getSetting('github_tag_name');
     $final[$id]['github_adv_commit'] = $plugin->getSetting('github_adv_commit');
