@@ -5,7 +5,7 @@ function pluginGetList() {
   $final = [];
 
   foreach ($plugins as $plugin) {
-  	if ($plugin == null || !is_dir( $plugin->getPath())) {
+  	if ($plugin === null || !is_dir( $plugin->getPath())) {
   		continue;
   	}
     $gitURL = $plugin->getRepositoryURL();
@@ -35,20 +35,21 @@ function pluginGetList() {
     $final[$id]['current_version'] = $plugin->getVersion();
     $final[$id]['owner'] = $github_parts[3];
     
-    $pluginGetVersion = getFormattedVersion($plugin->getVersion());
-    $pluginGetGitTagName = getFormattedVersion($plugin->getSetting('github_tag_name'));
-    $pluginGetGitComp = getFormattedVersion($plugin->getSetting('github_composer'));
+    $pluginGetVersion = $plugin->getVersion();
+    $pluginGetGitTagName = $plugin->getSetting('github_tag_name');
+    $pluginGetGitComp = $plugin->getSetting('github_composer');
+    $pluginNoVer = "0.1";
     
-    if ($pluginGetVersion == floatval("0.1")) {
+    if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
       $final[$id]['action'] = "Plugin does not have a version";
       $final[$id]['class'] = "bg-gray disabled";
-    } else if ($pluginGetGitTagName == $pluginGetVersion || $pluginGetGitComp == $pluginGetVersion) {
+    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "==") || GitCompare($pluginGetGitComp, $pluginGetVersion, "==")) {
       $final[$id]['action'] = "No action required";
       $final[$id]['class'] = "bg-green disabled";
-    } else if ($pluginGetGitTagName > $pluginGetVersion  && $pluginGetGitComp > $pluginGetVersion) {
+    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, ">")  && GitCompare($pluginGetGitComp, $pluginGetVersion, ">")) {
       $final[$id]['action'] = "Plugin requires update";
       $final[$id]['class'] = "bg-red disabled";
-    } else if ($pluginGetGitTagName < $pluginGetVersion  && $pluginGetGitComp < $pluginGetVersion) {
+    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "<")  && GitCompare($pluginGetGitComp, $pluginGetVersion, "<")) {
       $final[$id]['action'] = "Updated plugin installed";
       $final[$id]['class'] = "bg-yellow disabled";
     }
@@ -59,23 +60,18 @@ function pluginGetList() {
 
 function getGithubComposerVer($user, $repo) {
   
-  $token = elgg_get_plugin_setting('token', 'check_for_update');
   $url = "https://api.github.com/repos/{$user}/{$repo}/contents/elgg-plugin.php";
   $data = getGitProperty($url);
-  if($data['download_url'] == "") {
+  if (!array_key_exists('download_url', $data) || trim($data['download_url']) === '') {
     return "-";
   }
   $lines = file($data['download_url']);
   
   if($lines !== false) {
     foreach ($lines as $lineNumber => $line) {
-        if (strpos($line, 'version') !== false) {
-            $tmp = explode("=>", $line);
-            $tmp = str_replace(",", "", $tmp[1]);
-            $tmp = str_replace("'", "", $tmp);
-            $tmp = str_replace("\"", "", $tmp);
-            return $tmp;
-        }
+      if (preg_match("/['\"]version['\"]\s*=>\s*['\"]([^'\"]+)['\"]/", $line, $matches)) {
+        return trim($matches[1]);
+      }
     }
   }
     return "-";
@@ -113,7 +109,7 @@ function update_check_for_update_table() {
         
   			// Github Tag Name
   			$github_rel = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/releases/latest");
-  			$latest_tag_name = $github_rel['tag_name'];
+  			$latest_tag_name = $github_rel['tag_name'] ?? '-';
 
   			// Github SHA ID
   			$github_tags = getGitProperty("https://api.github.com/repos/$github_owner/$github_repo/tags");
@@ -176,13 +172,8 @@ function update_check_for_update_table() {
   });
 }
 
-function getFormattedVersion($ver) {
-  $ver = preg_replace('/[^0-9.]/', '',  $ver);
-  $vp = explode(".", $ver);
-  if(count($vp) >= 3) {
-    $ver = array_shift($vp). "." . implode("", $vp);
-  }
-  return floatval($ver);
+function GitCompare($a, $b, $op) {
+  return version_compare($a, $b, $op);
 }
 
 function update_check_for_update_elgg() {
@@ -194,11 +185,11 @@ function update_check_for_update_elgg() {
   $content = curl_exec($c);
   curl_close($c);
   $result = json_decode($content, true);
-  $current = getFormattedVersion(elgg_get_release());
+  $current = elgg_get_release();
   $tag_name = 0;
   foreach ($result as $key => $v) {
     if ($key >= 5) break;
-    if($current < getFormattedVersion($v['tag_name'])) {
+    if(GitCompare($current, $v['tag_name'], "<=")) {
       $tag_name = $v['tag_name'];
       break;
     }
