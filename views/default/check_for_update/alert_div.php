@@ -16,7 +16,7 @@ if ($flag == 1) {
 
 $current = elgg_get_release();
 $latest = elgg_get_plugin_from_id('check_for_update')->getSetting('latest_release');
-if ($current != $latest && $latest != null) {
+if (version_compare($current, $latest, "<")) {
 	echo elgg_view_message('error',
 	'New version of Elgg (v '.$latest.') available.',
 	['title' => 'Alert!']);
