@@ -1,61 +1,66 @@
 <?php
 
 function pluginGetList() {
-  $plugins = elgg_get_plugins('any');
-  $final = [];
-
-  foreach ($plugins as $plugin) {
-  	if ($plugin === null || !is_dir( $plugin->getPath())) {
-  		continue;
-  	}
-    $gitURL = $plugin->getRepositoryURL();
-    if($gitURL != "") {
-      $github_parts = explode("/", $gitURL);
-    } else {
-      $github_parts = [
-        1 => "",
-        2 => "",
-        3 => ""
-      ];
-    }
-    if($github_parts[3] == "elgg") {
-      continue;
-    }
-
-    $id = $plugin->getID();
-    $final[$id]['github_url'] = "";
-    if($github_parts[2] == "github.com") {
-      $final[$id]['github_url'] = $plugin->getRepositoryURL();
-    }
-    $final[$id]['id'] = $id;
-    $final[$id]['status'] = ($plugin->isActive() ? '<p class="label bg-green small">Active</p>' : '<p class="label bg-red small">Inactive</p>');
-    $final[$id]['github_composer'] = $plugin->getSetting('github_composer');
-    $final[$id]['github_tag_name'] = $plugin->getSetting('github_tag_name');
-    $final[$id]['github_adv_commit'] = $plugin->getSetting('github_adv_commit');
-    $final[$id]['current_version'] = $plugin->getVersion();
-    $final[$id]['owner'] = $github_parts[3];
+  return elgg_call(ELGG_IGNORE_ACCESS | ELGG_SHOW_DISABLED_ENTITIES, function() {
+    $plugins = elgg_get_plugins('any');
+    $final = [];
     
-    $pluginGetVersion = $plugin->getVersion();
-    $pluginGetGitTagName = $plugin->getSetting('github_tag_name');
-    $pluginGetGitComp = $plugin->getSetting('github_composer');
-    $pluginNoVer = "0.1";
-    
-    if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
-      $final[$id]['action'] = "Plugin does not have a version";
-      $final[$id]['class'] = "bg-gray disabled";
-    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "==") || GitCompare($pluginGetGitComp, $pluginGetVersion, "==")) {
-      $final[$id]['action'] = "No action required";
-      $final[$id]['class'] = "bg-green disabled";
-    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, ">")  && GitCompare($pluginGetGitComp, $pluginGetVersion, ">")) {
-      $final[$id]['action'] = "Plugin requires update";
-      $final[$id]['class'] = "bg-red disabled";
-    } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "<")  && GitCompare($pluginGetGitComp, $pluginGetVersion, "<")) {
-      $final[$id]['action'] = "Updated plugin installed";
-      $final[$id]['class'] = "bg-yellow disabled";
+    foreach ($plugins as $plugin) {
+      if ($plugin === null || !is_dir( $plugin->getPath())) {
+        continue;
+      }
+      $gitURL = $plugin->getRepositoryURL();
+      if($gitURL != "") {
+        $github_parts = explode("/", $gitURL);
+      } else {
+        $github_parts = [
+          1 => "",
+          2 => "",
+          3 => ""
+        ];
+      }
+      if($github_parts[3] == "elgg") {
+        continue;
+      }
+      
+      $id = $plugin->getID();
+      $final[$id]['github_url'] = "";
+      if($github_parts[2] == "github.com") {
+        $final[$id]['github_url'] = $plugin->getRepositoryURL();
+      }
+      $final[$id]['id'] = $id;
+      $final[$id]['status'] = ($plugin->isActive() ? '<p class="label bg-green small">Active</p>' : '<p class="label bg-red small">Inactive</p>');
+      $final[$id]['github_composer'] = elgg_get_plugin_setting('github_composer', $id);
+      $final[$id]['github_tag_name'] = elgg_get_plugin_setting('github_tag_name', $id);
+      $final[$id]['github_adv_commit'] = elgg_get_plugin_setting('github_adv_commit', $id);
+      $final[$id]['current_version'] = $plugin->getVersion();
+      $final[$id]['owner'] = $github_parts[3];
+      
+      $pluginGetVersion = $plugin->getVersion();
+      $pluginGetGitTagName = elgg_get_plugin_setting('github_tag_name', $id);
+      $pluginGetGitComp = elgg_get_plugin_setting('github_composer', $id);
+      $pluginNoVer = "0.1";
+      
+      if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
+        $final[$id]['action'] = "Plugin does not have a version";
+        $final[$id]['class'] = "bg-gray disabled";
+      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, ">") || GitCompare($pluginGetGitComp, $pluginGetVersion, ">")) {
+        $final[$id]['action'] = "Plugin requires update";
+        $final[$id]['class'] = "bg-red disabled";
+      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "<") || GitCompare($pluginGetGitComp, $pluginGetVersion, "<")) {
+        $final[$id]['action'] = "Updated plugin installed";
+        $final[$id]['class'] = "bg-yellow disabled";
+      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "==") && GitCompare($pluginGetGitComp, $pluginGetVersion, "==")) {
+        $final[$id]['action'] = "No action required";
+        $final[$id]['class'] = "bg-green disabled";
+      } else {
+        $final[$id]['action'] = "Action Unknown";
+        $final[$id]['class'] = "bg-blue disabled";
+      }
     }
-    
-  }
-  return $final;
+    var_dump($final);
+    return $final;
+  });
 }
 
 function getGithubComposerVer($user, $repo) {
@@ -154,15 +159,21 @@ function update_check_for_update_table() {
   			$latest_tag_name = str_replace(["v"," "], "", $latest_tag_name);
         $latest_tag_name = trim($latest_tag_name);
   			if ($latest_tag_name != $plugin['github_tag_name']) {
-  				elgg_get_plugin_from_id($plugin_id)->setSetting('github_tag_name', $latest_tag_name);
+          elgg_call(ELGG_IGNORE_ACCESS | ELGG_SHOW_DISABLED_ENTITIES, function() use ($plugin_id, $latest_tag_name) {
+            elgg_get_plugin_from_id($plugin_id)->setSetting('github_tag_name', $latest_tag_name);
+          });
   			}
         $github_composer = trim($github_composer);
   			if ($github_composer != $plugin['github_composer']) {
-  				elgg_get_plugin_from_id($plugin_id)->setSetting('github_composer', $github_composer);
+          elgg_call(ELGG_IGNORE_ACCESS | ELGG_SHOW_DISABLED_ENTITIES, function() use ($plugin_id, $github_composer) {
+            elgg_get_plugin_from_id($plugin_id)->setSetting('github_composer', $github_composer);
+          });
   			}
         $adv_commit = trim($adv_commit);
   			if ($adv_commit != (int) $plugin['github_adv_commit']) {
-  			  elgg_get_plugin_from_id($plugin_id)->setSetting('github_adv_commit', $adv_commit);
+          elgg_call(ELGG_IGNORE_ACCESS | ELGG_SHOW_DISABLED_ENTITIES, function() use ($plugin_id, $adv_commit) {
+            elgg_get_plugin_from_id($plugin_id)->setSetting('github_adv_commit', $adv_commit);
+          });
   			}
   	}
 
