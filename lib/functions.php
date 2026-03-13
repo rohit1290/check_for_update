@@ -48,10 +48,10 @@ function pluginGetList() {
       } else if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
         $final[$id]['action'] = "Plugin has no version";
         $final[$id]['class'] = "bg-gray disabled";
-      } else if (GitCompare($pluginGetVersion, $maxVersion, ">")) {
+      } else if (GitCompare($pluginGetVersion, $maxVersion, "<")) {
         $final[$id]['action'] = "Plugin requires update";
         $final[$id]['class'] = "bg-red disabled";
-      } else if (GitCompare($pluginGetVersion, $maxVersion, "<")) {
+      } else if (GitCompare($pluginGetVersion, $maxVersion, ">")) {
         $final[$id]['action'] = "Updated plugin installed";
         $final[$id]['class'] = "bg-yellow disabled";
       } else if (GitCompare($pluginGetVersion, $maxVersion, "==")) {
