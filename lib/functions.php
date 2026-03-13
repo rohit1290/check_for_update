@@ -58,7 +58,7 @@ function pluginGetList() {
         $final[$id]['class'] = "bg-blue disabled";
       }
     }
-    var_dump($final);
+    // var_dump($final);
     return $final;
   });
 }
