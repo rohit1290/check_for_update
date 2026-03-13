@@ -37,21 +37,25 @@ function pluginGetList() {
       $final[$id]['owner'] = $github_parts[3];
       
       $pluginGetVersion = $plugin->getVersion();
-      $pluginGetGitTagName = elgg_get_plugin_setting('github_tag_name', $id);
-      $pluginGetGitComp = elgg_get_plugin_setting('github_composer', $id);
+      $versions = [elgg_get_plugin_setting('github_tag_name', $id), elgg_get_plugin_setting('github_composer', $id)];
+      usort($versions, 'version_compare');
+      $maxVersion = end($versions);
       $pluginNoVer = "0.1";
       
-      if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
-        $final[$id]['action'] = "Plugin does not have a version";
+      if(!$plugin->isActive()) {
+        $final[$id]['action'] = "Plugin not active";
         $final[$id]['class'] = "bg-gray disabled";
-      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, ">") || GitCompare($pluginGetGitComp, $pluginGetVersion, ">")) {
+      } else if (GitCompare($pluginGetVersion, $pluginNoVer, "==")) {
+        $final[$id]['action'] = "Plugin has no version";
+        $final[$id]['class'] = "bg-gray disabled";
+      } else if (GitCompare($pluginGetVersion, $maxVersion, ">")) {
         $final[$id]['action'] = "Plugin requires update";
         $final[$id]['class'] = "bg-red disabled";
-      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "<") || GitCompare($pluginGetGitComp, $pluginGetVersion, "<")) {
+      } else if (GitCompare($pluginGetVersion, $maxVersion, "<")) {
         $final[$id]['action'] = "Updated plugin installed";
         $final[$id]['class'] = "bg-yellow disabled";
-      } else if (GitCompare($pluginGetGitTagName, $pluginGetVersion, "==") && GitCompare($pluginGetGitComp, $pluginGetVersion, "==")) {
-        $final[$id]['action'] = "No action required";
+      } else if (GitCompare($pluginGetVersion, $maxVersion, "==")) {
+        $final[$id]['action'] = "No Action required";
         $final[$id]['class'] = "bg-green disabled";
       } else {
         $final[$id]['action'] = "Action Unknown";
