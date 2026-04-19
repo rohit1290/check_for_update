@@ -27,7 +27,9 @@ return [
 	],
 	'view_extensions' => [
 		'admin/dashboard' => [
-			'check_for_update/alert_div' => [],
+			'check_for_update/alert_div' => [
+				'priority' => 1
+			],
 		],
 	],
 ];
